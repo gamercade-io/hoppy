@@ -17,6 +17,7 @@ impl crate::Game for MyGame {
     fn init() -> Self {
         use crate::components::*;
 
+        // Initialize our working data
         let mut world = World::new();
         let physics = PhysicsSimulation::new();
         let player_count = gc::num_players();
@@ -24,7 +25,10 @@ impl crate::Game for MyGame {
         // TODO: Add Colliders/Rigid bodies etc
         (0..player_count).for_each(|player_id| {
             let mut player = EntityBuilder::new();
-            player.add(PlayerId(player_id)).add(Controller::default());
+            player
+                .add(PlayerId(player_id))
+                .add(Controller::default())
+                .add(ActorState::default());
 
             let _player_entity = world.spawn(player.build());
         });
@@ -44,6 +48,8 @@ impl crate::Game for MyGame {
     /// Handle all of your rendering code here
     fn draw(&self) {
         gc::clear_screen(GraphicsParameters::default());
+
+        // TODO: Create a render system and draw the players, and floor
         gc::rect(GraphicsParameters::default().color_index(9), 50, 50, 64, 64);
     }
 }
