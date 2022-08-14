@@ -6,6 +6,7 @@ use crate::{
 };
 use gamercade_rs::{prelude as gc, GraphicsParameters};
 
+/// Converts a point in physics space to pixel space.
 fn physics_point_to_screen(point: &Point2<f32>, height: usize) -> (i32, i32) {
     let x = (point.x * PHYSICS_PIXEL_SCALING).round() as i32;
     let y = (height as f32 - (point.y * PHYSICS_PIXEL_SCALING)).round() as i32;
@@ -13,6 +14,7 @@ fn physics_point_to_screen(point: &Point2<f32>, height: usize) -> (i32, i32) {
     (x, y)
 }
 
+/// This system renders collision volumes and player sprites (if they have one)
 pub fn render_system(
     world: &World,
     physics: &PhysicsSimulation,

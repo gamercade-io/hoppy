@@ -8,6 +8,7 @@ use crate::game::GRAVITY;
 use crate::systems::CollisionEventEntry;
 use gamercade_rs::prelude as gc;
 
+/// Primarily a abstraction over the entire Rapier crate
 pub struct PhysicsSimulation {
     pub rigid_body_set: RigidBodySet,
     pub collider_set: ColliderSet,
@@ -39,6 +40,8 @@ impl PhysicsSimulation {
         }
     }
 
+    /// Called every frame. This generates a list of collision events
+    /// which should then be passed on to the collision system.
     pub fn step(&mut self) -> Vec<CollisionEventEntry> {
         let collision_event_handler = CollisionEventHandler::default();
 

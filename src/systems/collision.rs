@@ -12,6 +12,8 @@ pub struct CollisionEventEntry {
     pub entity_b: Entity,
 }
 
+/// This system loops through the list of collision events
+/// and processes them.
 pub fn collision_system(
     world: &mut World,
     mut events: Vec<CollisionEventEntry>,
@@ -46,6 +48,8 @@ pub fn collision_system(
     })
 }
 
+/// Handles character <--> floor collisions
+/// Generally this is just setting the ActorState and adjusting velocities.
 fn handle_character_floor_collision(
     world: &mut World,
     character: Entity,
@@ -58,7 +62,7 @@ fn handle_character_floor_collision(
         let rigidbody = world.get::<&RigidBodyHandle>(character).unwrap();
         let rigidbody = rigidbodies.get_mut(*rigidbody).unwrap();
 
-        let mut new_vel = rigidbody.linvel().clone();
+        let mut new_vel = *rigidbody.linvel();
         new_vel.y = 0.0;
 
         rigidbody.set_linvel(new_vel, true);
@@ -69,6 +73,9 @@ fn handle_character_floor_collision(
     }
 }
 
+/// Handles Character <--> Character collisions
+/// This checks for a player bonking another, if its y location is above the other and
+/// it is travling downward.
 fn handle_character_character_collision(
     world: &mut World,
     character_a: Entity,
@@ -92,9 +99,7 @@ fn handle_character_character_collision(
         if a_vel.is_sign_negative() {
             *world.get::<&mut ActorState>(character_b).unwrap() = ActorState::Dead;
         }
-    } else {
-        if b_vel.is_sign_negative() {
-            *world.get::<&mut ActorState>(character_a).unwrap() = ActorState::Dead;
-        }
+    } else if b_vel.is_sign_negative() {
+        *world.get::<&mut ActorState>(character_a).unwrap() = ActorState::Dead;
     }
 }

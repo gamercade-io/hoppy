@@ -10,6 +10,8 @@ use crate::{
 };
 use gamercade_rs::prelude as gc;
 
+/// This system is responsible for respawning players.
+/// Players are ready for respawning when their ActorState is Dead.
 pub fn respawn_system(
     world: &mut World,
     rigidbodies: &mut RigidBodySet,
@@ -22,10 +24,8 @@ pub fn respawn_system(
         .for_each(|(_, (handle, state, player))| {
             if ActorState::Dead == *state {
                 if let Some(rigidbody) = rigidbodies.get_mut(*handle) {
-                    let x = gc::random_float_range(
-                        0.0,
-                        (screen_width as f32 / 2.0) / PHYSICS_PIXEL_SCALING,
-                    );
+                    let x =
+                        gc::random_float_range(0.0, screen_width as f32 / PHYSICS_PIXEL_SCALING);
                     let y = screen_height as f32 / PHYSICS_PIXEL_SCALING;
                     let pos = Vector2::new(x, y);
 

@@ -10,13 +10,15 @@ use crate::{
     game::{GRAVITY, MOVEMENT_SPEED_AIRBORNE, MOVEMENT_SPEED_GROUNDED},
 };
 
+/// This system handles most of the physics movement for players,
+/// since they are done manually via Kinematic movement.
 pub fn movement_system(world: &mut World, physics: &mut RigidBodySet, dt: f32) {
     world
         .query::<(&Controller, &RigidBodyHandle, &ActorState)>()
         .into_iter()
         .for_each(|(_, (controller, handle, state))| {
             if let Some(rigidbody) = physics.get_mut(*handle) {
-                let mut current_velocity = rigidbody.linvel().clone();
+                let mut current_velocity = *rigidbody.linvel();
                 let multiplier = match state {
                     ActorState::Grounded => MOVEMENT_SPEED_GROUNDED,
                     ActorState::Airborne => {

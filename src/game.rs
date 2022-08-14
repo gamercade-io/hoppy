@@ -151,6 +151,8 @@ impl crate::Game for MyGame {
     /// Handle all of your rendering code here
     fn draw(&self) {
         use crate::systems::*;
+
+        // Hardcoded black color from the 0th palette
         gc::clear_screen(GraphicsParameters::default().color_index(16));
 
         render_system(

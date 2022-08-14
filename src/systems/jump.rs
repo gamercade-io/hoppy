@@ -11,6 +11,7 @@ use crate::{
 use gamercade_rs::prelude as gc;
 
 /// This system takes input from the controller and makes players jump
+/// Players can only jump if they are grounded.
 pub fn jump_system(world: &mut World, rigidbodies: &mut RigidBodySet) {
     world
         .query_mut::<(&Controller, &PlayerId, &mut ActorState, &RigidBodyHandle)>()
