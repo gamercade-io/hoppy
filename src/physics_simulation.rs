@@ -1,5 +1,7 @@
 use rapier2d::{na::Vector2, prelude::*};
 
+use crate::game::GRAVITY;
+
 pub struct PhysicsSimulation {
     pub rigid_body_set: RigidBodySet,
     pub collider_set: ColliderSet,
@@ -19,7 +21,7 @@ impl PhysicsSimulation {
         Self {
             rigid_body_set: RigidBodySet::new(),
             collider_set: ColliderSet::new(),
-            gravity: Vector2::new(0.0, -9.81),
+            gravity: Vector2::new(0.0, GRAVITY),
             physics_pipeline: PhysicsPipeline::new(),
             integration_parameters: IntegrationParameters::default(),
             island_manager: IslandManager::default(),

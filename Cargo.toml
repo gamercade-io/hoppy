@@ -13,5 +13,6 @@ gamercade_rs = "0.1.1"
 hecs = "0.9.0"
 rapier2d = "0.14.0"
 
-[profile.release]
-lto = true
+# Enable this for smaller build sizes, but longer compilation times
+# [profile.release]
+# lto = true
