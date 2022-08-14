@@ -7,6 +7,6 @@ pub enum ActorState {
 
 impl Default for ActorState {
     fn default() -> Self {
-        Self::Airborne
+        Self::Dead
     }
 }

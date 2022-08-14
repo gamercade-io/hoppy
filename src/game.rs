@@ -10,10 +10,10 @@ use rapier2d::{
 
 use crate::physics_simulation::PhysicsSimulation;
 
-pub const GRAVITY: f32 = -9.81;
-pub const MOVEMENT_SPEED_GROUNDED: f32 = 0.5;
-pub const MOVEMENT_SPEED_AIRBORNE: f32 = 0.1;
-pub const JUMP_POWER: f32 = 1.;
+pub const GRAVITY: f32 = -7.0;
+pub const MOVEMENT_SPEED_GROUNDED: f32 = 0.4;
+pub const MOVEMENT_SPEED_AIRBORNE: f32 = 0.075;
+pub const JUMP_POWER: f32 = 1.5;
 pub const PHYSICS_PIXEL_SCALING: f32 = 1024.0;
 
 // Our game state. Edit this as you wish.
@@ -44,7 +44,7 @@ impl crate::Game for MyGame {
         // We use 0.98 so we can see the ground better
         let ground_collider = ColliderBuilder::cuboid(
             half_width * 0.98 / PHYSICS_PIXEL_SCALING,
-            0.1 / PHYSICS_PIXEL_SCALING,
+            0.25 / PHYSICS_PIXEL_SCALING,
         )
         .translation(Vector2::new(
             half_width / PHYSICS_PIXEL_SCALING,
@@ -69,10 +69,6 @@ impl crate::Game for MyGame {
             // Add the colliders/rigid bodies
             let rigid_body = RigidBodyBuilder::kinematic_velocity_based()
                 .lock_rotations()
-                .translation(Vector2::new(
-                    half_width / PHYSICS_PIXEL_SCALING,
-                    screen_height as f32 / PHYSICS_PIXEL_SCALING,
-                ))
                 .build();
             let rigid_body_handle = physics.rigid_body_set.insert(rigid_body);
             let collider =
@@ -120,18 +116,18 @@ impl crate::Game for MyGame {
     /// Handle all of your game state logic here
     fn update(&mut self) {
         use crate::systems::*;
-        input_system(&mut self.world);
-        jump_system(&mut self.world, &mut self.physics.rigid_body_set);
-        movement_system(&mut self.world, &mut self.physics.rigid_body_set, self.dt);
+        let world = &mut self.world;
+
+        input_system(world);
+        jump_system(world, &mut self.physics.rigid_body_set);
+        movement_system(world, &mut self.physics.rigid_body_set, self.dt);
 
         // Step produces a list of collision
         // events which we pass onto the collision system
         let collision_events = self.physics.step();
-        collision_system(
-            &mut self.world,
-            collision_events,
-            &mut self.physics.rigid_body_set,
-        );
+        collision_system(world, collision_events, &mut self.physics.rigid_body_set);
+
+        respawn_system(world, &mut self.physics.rigid_body_set, self.screen_width, self.screen_height);
     }
 
     /// Handle all of your rendering code here
