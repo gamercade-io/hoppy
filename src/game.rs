@@ -5,14 +5,15 @@ use gamercade_rs::{
 use hecs::{EntityBuilder, World};
 use rapier2d::{
     na::Vector2,
-    prelude::{ActiveEvents, ColliderBuilder, RigidBodyBuilder},
+    prelude::{ActiveCollisionTypes, ActiveEvents, ColliderBuilder, RigidBodyBuilder},
 };
 
 use crate::physics_simulation::PhysicsSimulation;
 
 pub const GRAVITY: f32 = -9.81;
-pub const MOVEMENT_SPEED_GROUNDED: f32 = 0.025;
-pub const MOVEMENT_SPEED_AIRBORNE: f32 = 0.4;
+pub const MOVEMENT_SPEED_GROUNDED: f32 = 0.5;
+pub const MOVEMENT_SPEED_AIRBORNE: f32 = 0.1;
+pub const JUMP_POWER: f32 = 1.;
 pub const PHYSICS_PIXEL_SCALING: f32 = 1024.0;
 
 // Our game state. Edit this as you wish.
@@ -21,6 +22,7 @@ pub struct MyGame {
     physics: PhysicsSimulation,
     screen_width: usize,
     screen_height: usize,
+    dt: f32,
 }
 
 impl crate::Game for MyGame {
@@ -34,6 +36,7 @@ impl crate::Game for MyGame {
         let player_count = gc::num_players();
         let screen_width = gc::width();
         let screen_height = gc::height();
+        let dt = gc::frame_time();
         let half_width = screen_width as f32 / 2.0;
         let ground_plane_y_offset = screen_height as f32 * 0.1;
 
@@ -49,12 +52,22 @@ impl crate::Game for MyGame {
         ))
         .build();
         let ground_collider = physics.collider_set.insert(ground_collider);
-        world.spawn(EntityBuilder::new().add(ground_collider).build());
+        let ground_id = world.spawn(
+            EntityBuilder::new()
+                .add(ground_collider)
+                .add(CollisionType::Floor)
+                .build(),
+        );
+        physics
+            .collider_set
+            .get_mut(ground_collider)
+            .unwrap()
+            .user_data = u64::from(ground_id.to_bits()) as u128;
 
         // Generate an entity for each player
         (0..player_count).for_each(|player_id| {
             // Add the colliders/rigid bodies
-            let rigid_body = RigidBodyBuilder::dynamic()
+            let rigid_body = RigidBodyBuilder::kinematic_velocity_based()
                 .lock_rotations()
                 .translation(Vector2::new(
                     half_width / PHYSICS_PIXEL_SCALING,
@@ -64,6 +77,11 @@ impl crate::Game for MyGame {
             let rigid_body_handle = physics.rigid_body_set.insert(rigid_body);
             let collider =
                 ColliderBuilder::cuboid(64.0 / PHYSICS_PIXEL_SCALING, 64.0 / PHYSICS_PIXEL_SCALING)
+                    .active_collision_types(
+                        ActiveCollisionTypes::default()
+                            | ActiveCollisionTypes::KINEMATIC_FIXED
+                            | ActiveCollisionTypes::KINEMATIC_KINEMATIC,
+                    )
                     .active_events(ActiveEvents::COLLISION_EVENTS)
                     .build();
             let collider_handle = physics.collider_set.insert_with_parent(
@@ -77,10 +95,16 @@ impl crate::Game for MyGame {
                 .add(PlayerId(player_id))
                 .add(Controller::default())
                 .add(ActorState::default())
+                .add(CollisionType::Character)
                 .add(rigid_body_handle)
                 .add(collider_handle);
 
-            let _player_entity = world.spawn(player.build());
+            let player_entity = world.spawn(player.build());
+            physics
+                .collider_set
+                .get_mut(collider_handle)
+                .unwrap()
+                .user_data = u64::from(player_entity.to_bits()) as u128;
         });
 
         gc::console_log("Game Initialized");
@@ -89,6 +113,7 @@ impl crate::Game for MyGame {
             physics,
             screen_width,
             screen_height,
+            dt,
         }
     }
 
@@ -96,9 +121,17 @@ impl crate::Game for MyGame {
     fn update(&mut self) {
         use crate::systems::*;
         input_system(&mut self.world);
-        jump_system(&mut self.world);
-        movement_system(&mut self.world, &mut self.physics.rigid_body_set);
-        self.physics.step();
+        jump_system(&mut self.world, &mut self.physics.rigid_body_set);
+        movement_system(&mut self.world, &mut self.physics.rigid_body_set, self.dt);
+
+        // Step produces a list of collision
+        // events which we pass onto the collision system
+        let collision_events = self.physics.step();
+        collision_system(
+            &mut self.world,
+            collision_events,
+            &mut self.physics.rigid_body_set,
+        );
     }
 
     /// Handle all of your rendering code here
