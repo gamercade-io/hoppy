@@ -15,6 +15,8 @@ pub const MOVEMENT_SPEED_GROUNDED: f32 = 0.4;
 pub const MOVEMENT_SPEED_AIRBORNE: f32 = 0.075;
 pub const JUMP_POWER: f32 = 1.5;
 pub const PHYSICS_PIXEL_SCALING: f32 = 1024.0;
+pub const PLAYER_HALF_HEIGHT: f32 = 26.0;
+pub const PLAYER_HALF_WIDTH: f32 = 16.0;
 
 // Our game state. Edit this as you wish.
 pub struct MyGame {
@@ -23,6 +25,8 @@ pub struct MyGame {
     screen_width: usize,
     screen_height: usize,
     dt: f32,
+    player_width: u32,
+    player_height: u32,
 }
 
 impl crate::Game for MyGame {
@@ -39,6 +43,10 @@ impl crate::Game for MyGame {
         let dt = gc::frame_time();
         let half_width = screen_width as f32 / 2.0;
         let ground_plane_y_offset = screen_height as f32 * 0.1;
+
+        // Sprite data
+        let player_width = gc::sprite_width(0).unwrap();
+        let player_height = gc::sprite_height(0).unwrap();
 
         // Create the ground
         // We use 0.98 so we can see the ground better
@@ -71,15 +79,17 @@ impl crate::Game for MyGame {
                 .lock_rotations()
                 .build();
             let rigid_body_handle = physics.rigid_body_set.insert(rigid_body);
-            let collider =
-                ColliderBuilder::cuboid(64.0 / PHYSICS_PIXEL_SCALING, 64.0 / PHYSICS_PIXEL_SCALING)
-                    .active_collision_types(
-                        ActiveCollisionTypes::default()
-                            | ActiveCollisionTypes::KINEMATIC_FIXED
-                            | ActiveCollisionTypes::KINEMATIC_KINEMATIC,
-                    )
-                    .active_events(ActiveEvents::COLLISION_EVENTS)
-                    .build();
+            let collider = ColliderBuilder::cuboid(
+                PLAYER_HALF_WIDTH / PHYSICS_PIXEL_SCALING,
+                PLAYER_HALF_HEIGHT / PHYSICS_PIXEL_SCALING,
+            )
+            .active_collision_types(
+                ActiveCollisionTypes::default()
+                    | ActiveCollisionTypes::KINEMATIC_FIXED
+                    | ActiveCollisionTypes::KINEMATIC_KINEMATIC,
+            )
+            .active_events(ActiveEvents::COLLISION_EVENTS)
+            .build();
             let collider_handle = physics.collider_set.insert_with_parent(
                 collider,
                 rigid_body_handle,
@@ -110,6 +120,8 @@ impl crate::Game for MyGame {
             screen_width,
             screen_height,
             dt,
+            player_height,
+            player_width,
         }
     }
 
@@ -139,8 +151,14 @@ impl crate::Game for MyGame {
     /// Handle all of your rendering code here
     fn draw(&self) {
         use crate::systems::*;
-        gc::clear_screen(GraphicsParameters::default());
+        gc::clear_screen(GraphicsParameters::default().color_index(16));
 
-        render_system(&self.world, &self.physics, self.screen_height);
+        render_system(
+            &self.world,
+            &self.physics,
+            self.screen_height,
+            self.player_width,
+            self.player_height,
+        );
     }
 }
