@@ -127,7 +127,13 @@ impl crate::Game for MyGame {
         let collision_events = self.physics.step();
         collision_system(world, collision_events, &mut self.physics.rigid_body_set);
 
-        respawn_system(world, &mut self.physics.rigid_body_set, self.screen_width, self.screen_height);
+        respawn_system(
+            world,
+            &mut self.physics.rigid_body_set,
+            self.screen_width,
+            self.screen_height,
+        );
+        bounds_system(world, &mut self.physics.rigid_body_set, self.screen_width)
     }
 
     /// Handle all of your rendering code here
@@ -135,11 +141,6 @@ impl crate::Game for MyGame {
         use crate::systems::*;
         gc::clear_screen(GraphicsParameters::default());
 
-        render_system(
-            &self.world,
-            &self.physics,
-            self.screen_width,
-            self.screen_height,
-        );
+        render_system(&self.world, &self.physics, self.screen_height);
     }
 }

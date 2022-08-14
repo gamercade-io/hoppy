@@ -1,5 +1,5 @@
 use hecs::{Entity, World};
-use rapier2d::prelude::{CollisionEvent, RigidBody, RigidBodyHandle, RigidBodySet};
+use rapier2d::prelude::{CollisionEvent, RigidBodyHandle, RigidBodySet};
 
 use gamercade_rs::prelude as gc;
 
@@ -33,7 +33,14 @@ pub fn collision_system(
                 }
             }
             (CollisionType::Character, CollisionType::Character) => {
-                gc::console_log("TODO: Charater & Charater collosion response")
+                if event.event.started() {
+                    handle_character_character_collision(
+                        world,
+                        event.entity_a,
+                        event.entity_b,
+                        rigidbodies,
+                    )
+                }
             }
         }
     })
@@ -59,5 +66,35 @@ fn handle_character_floor_collision(
         *character_state = ActorState::Grounded;
     } else {
         *character_state = ActorState::Airborne;
+    }
+}
+
+fn handle_character_character_collision(
+    world: &mut World,
+    character_a: Entity,
+    character_b: Entity,
+    rigid_bodies: &RigidBodySet,
+) {
+    let a_handle = world.get::<&RigidBodyHandle>(character_a).unwrap();
+    let b_handle = world.get::<&RigidBodyHandle>(character_b).unwrap();
+
+    let a_body = rigid_bodies.get(*a_handle).unwrap();
+    let b_body = rigid_bodies.get(*b_handle).unwrap();
+
+    let a_pos = a_body.position().translation.y;
+    let b_pos = b_body.position().translation.y;
+
+    let a_vel = a_body.linvel().y;
+    let b_vel = b_body.linvel().y;
+
+    // A is above B
+    if a_pos > b_pos {
+        if a_vel.is_sign_negative() {
+            *world.get::<&mut ActorState>(character_b).unwrap() = ActorState::Dead;
+        }
+    } else {
+        if b_vel.is_sign_negative() {
+            *world.get::<&mut ActorState>(character_a).unwrap() = ActorState::Dead;
+        }
     }
 }
