@@ -479,5 +479,157 @@
       }
     ]
   },
-  "sounds": {}
+    "sounds": {
+    "songs": [],
+    "chains": [
+      {
+        "name": "Chain 0",
+        "data": {
+          "entries": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      }
+    ],
+    "phrases": [
+      {
+        "name": "Phrase 0",
+        "data": {
+          "entries": [
+            {
+              "note": 36,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 38,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 40,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 41,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 43,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 45,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 47,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null,
+            {
+              "note": 48,
+              "volume": 255,
+              "instrument": 0,
+              "effects": [
+                null,
+                null,
+                null
+              ]
+            },
+            null
+          ]
+        }
+      }
+    ],
+    "instruments": [
+      {
+        "name": "Instrument 0",
+        "data": {
+          "Wavetable": {
+            "data": "AAAMixj4JScw+zxWRxxRM1qBYvFqbHDhdkB6fH2Jf2F//39hfYl6fHZAcOFqbGLxWoFRM0ccPFYw+yUnGPgMiwAA83XnCNrZzwXDqrjkrs2lf50PlZSPH4nAhYSCd4CfgAGAn4J3hYSJwI8flZSdD6V/rs245MOqzwXa2ecI83U=",
+            "envelope": {
+              "total_level": 255,
+              "sustain_level": 255,
+              "attack_time": 16,
+              "decay_attack_time": 0,
+              "decay_sustain_time": 64,
+              "release_time": 64
+            },
+            "interpolator": "Linear"
+          }
+        }
+      }
+    ],
+    "sfx": [
+      {
+        "name": "Sfx 0",
+        "data": {
+          "bpm": 120.0,
+          "chain": 0
+        }
+      }
+    ]
+  }
 }
