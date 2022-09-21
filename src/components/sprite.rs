@@ -1,6 +1,13 @@
 use gamercade_rs::prelude::GraphicsParameters;
 
-pub enum Sprite {
+pub struct Sprite {
+    pub x_offset: u32,
+    pub y_offset: u32,
+
+    pub kind: SpriteKind,
+}
+
+pub enum SpriteKind {
     Static(GraphicsParameters),
     Animated(AnimatedSprite),
 }
@@ -13,11 +20,11 @@ pub struct AnimatedSprite {
     pub flip_y: bool,
 }
 
-impl Sprite {
+impl SpriteKind {
     pub fn as_parameters(&self) -> GraphicsParameters {
         match self {
-            Sprite::Static(gp) => *gp,
-            Sprite::Animated(sprite) => GraphicsParameters::new()
+            SpriteKind::Static(gp) => *gp,
+            SpriteKind::Animated(sprite) => GraphicsParameters::new()
                 .palette_index(sprite.palette)
                 .sprite_sheet_index(sprite.sprite_sheet)
                 .sprite_index(sprite.sprite)

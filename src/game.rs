@@ -25,6 +25,9 @@ impl crate::Game for MyGame {
         let screen_width = gc::width();
         let screen_height = gc::height();
 
+        let x_offset = 32;
+        let y_offset = 12;
+
         // Generate an entity for each player
         (0..player_count).for_each(|player_id| {
             // Add the colliders/rigid bodies
@@ -42,13 +45,17 @@ impl crate::Game for MyGame {
                     kind: PhysicsVolumeKind::Actor(ActorState::default()),
                 })
                 .add(Velocity::default())
-                .add(Sprite::Animated(AnimatedSprite {
-                    palette: player_id as u8,
-                    sprite_sheet: player_id as u8,
-                    sprite: 0,
-                    flip_x: false,
-                    flip_y: false,
-                }));
+                .add(Sprite {
+                    x_offset,
+                    y_offset,
+                    kind: SpriteKind::Animated(AnimatedSprite {
+                        palette: player_id as u8,
+                        sprite_sheet: player_id as u8,
+                        sprite: 0,
+                        flip_x: false,
+                        flip_y: false,
+                    }),
+                });
 
             world.spawn(player.build());
         });
@@ -83,6 +90,7 @@ impl crate::Game for MyGame {
 
         input_system(world);
         movement_system(world);
+        sprite_facing_system(world);
         physics_system(world);
         actor_actor_collision_system(world);
 
