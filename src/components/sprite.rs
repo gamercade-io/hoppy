@@ -1,9 +1,10 @@
+use std::ops::Range;
+
 use gamercade_rs::prelude::GraphicsParameters;
 
 pub struct Sprite {
     pub x_offset: u32,
     pub y_offset: u32,
-
     pub kind: SpriteKind,
 }
 
@@ -18,6 +19,9 @@ pub struct AnimatedSprite {
     pub sprite: u8,
     pub flip_x: bool,
     pub flip_y: bool,
+
+    pub current_range: Range<u8>,
+    pub frame_count: u8,
 }
 
 impl SpriteKind {
@@ -33,3 +37,7 @@ impl SpriteKind {
         }
     }
 }
+
+pub const IDLE_RANGE: Range<u8> = 0..14;
+pub const RUN_RANGE: Range<u8> = 15..19;
+pub const TICKS_PER_FRAME: u8 = 6;

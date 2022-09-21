@@ -111,7 +111,7 @@ fn move_direction_x(
     solids: &[Solid],
 ) -> Option<Entity> {
     position.x.remainder += amount;
-    let mut movement = position.x.remainder.round() as i32;
+    let mut movement = position.x.remainder.floor() as i32;
 
     if movement != 0 {
         position.x.remainder -= movement as f32;
@@ -141,7 +141,7 @@ fn move_direction_y(
     solids: &[Solid],
 ) -> Option<Entity> {
     position.y.remainder += amount;
-    let mut movement = position.y.remainder.round() as i32;
+    let mut movement = position.y.remainder.floor() as i32;
 
     if movement != 0 {
         position.y.remainder -= movement as f32;

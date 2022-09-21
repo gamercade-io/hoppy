@@ -1,4 +1,5 @@
 mod actor_actor_collision;
+mod animated_sprite;
 mod bounds;
 mod input;
 mod movement;
@@ -8,6 +9,7 @@ mod respawn;
 mod sprite_facing;
 
 pub use actor_actor_collision::*;
+pub use animated_sprite::*;
 pub use bounds::*;
 pub use input::*;
 pub use movement::*;

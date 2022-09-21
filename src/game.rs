@@ -1,10 +1,10 @@
 use gamercade_rs::prelude::{self as gc, GraphicsParameters};
 use hecs::{EntityBuilder, World};
 
-pub const GRAVITY: f32 = 3.0;
+pub const GRAVITY: f32 = 1.5;
 pub const MOVEMENT_SPEED_GROUNDED: f32 = 5.0;
 pub const MOVEMENT_SPEED_AIRBORNE: f32 = 1.25;
-pub const JUMP_POWER: f32 = 25.0;
+pub const JUMP_POWER: f32 = 20.0;
 pub const PLAYER_HEIGHT: u32 = 52;
 pub const PLAYER_WIDTH: u32 = 32;
 
@@ -54,6 +54,8 @@ impl crate::Game for MyGame {
                         sprite: 0,
                         flip_x: false,
                         flip_y: false,
+                        current_range: IDLE_RANGE,
+                        frame_count: 0,
                     }),
                 });
 
@@ -91,6 +93,7 @@ impl crate::Game for MyGame {
         input_system(world);
         movement_system(world);
         sprite_facing_system(world);
+        animated_sprite_system(world);
         physics_system(world);
         actor_actor_collision_system(world);
 
