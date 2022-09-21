@@ -7,7 +7,6 @@ mod game;
 use game::MyGame;
 
 mod components;
-mod physics_simulation;
 mod systems;
 
 pub trait Game {

@@ -1,36 +1,29 @@
-use gamercade_rs::text::console_log;
 use hecs::World;
-use rapier2d::{
-    na::Vector2,
-    prelude::{RigidBodyHandle, RigidBodySet},
-};
 
 use crate::{
-    components::{ActorState, Controller},
-    game::{GRAVITY, MOVEMENT_SPEED_AIRBORNE, MOVEMENT_SPEED_GROUNDED},
+    components::{ActorState, ButtonState, Controller, PhysicsVolume, PhysicsVolumeKind, Velocity},
+    game::{JUMP_POWER, MOVEMENT_SPEED_AIRBORNE, MOVEMENT_SPEED_GROUNDED},
 };
 
-/// This system handles most of the physics movement for players,
-/// since they are done manually via Kinematic movement.
-pub fn movement_system(world: &mut World, physics: &mut RigidBodySet, dt: f32) {
+/// This system takes input from the controller and makes players jump and move as required
+/// Players can only jump if they are grounded.
+pub fn movement_system(world: &mut World) {
     world
-        .query::<(&Controller, &RigidBodyHandle, &ActorState)>()
+        .query_mut::<(&Controller, &mut Velocity, &mut PhysicsVolume)>()
         .into_iter()
-        .for_each(|(_, (controller, handle, state))| {
-            if let Some(rigidbody) = physics.get_mut(*handle) {
-                let mut current_velocity = *rigidbody.linvel();
-                let multiplier = match state {
-                    ActorState::Grounded => MOVEMENT_SPEED_GROUNDED,
-                    ActorState::Airborne => {
-                        current_velocity += Vector2::new(0.0, GRAVITY) * dt;
-                        MOVEMENT_SPEED_AIRBORNE
+        .for_each(|(_, (controller, velocity, physics))| {
+            let x_mul = match physics.kind {
+                PhysicsVolumeKind::Actor(ActorState::Grounded) => {
+                    if controller.a == ButtonState::JustPressed {
+                        physics.kind = PhysicsVolumeKind::Actor(ActorState::Airborne);
+                        velocity.0.y -= JUMP_POWER;
                     }
-                    ActorState::Dead => 0.0,
-                };
-                current_velocity += Vector2::new(controller.movement.x * multiplier, 0.0) * dt;
-                rigidbody.set_linvel(current_velocity, true);
-            } else {
-                console_log("movement_system tried to fetch an invalid rigid body handle");
-            }
+                    MOVEMENT_SPEED_GROUNDED
+                }
+                PhysicsVolumeKind::Actor(ActorState::Airborne) => MOVEMENT_SPEED_AIRBORNE,
+                _ => return,
+            };
+
+            velocity.0.x = controller.movement_x * x_mul;
         });
 }

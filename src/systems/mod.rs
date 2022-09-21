@@ -1,15 +1,16 @@
+mod actor_actor_collision;
 mod bounds;
-mod collision;
 mod input;
-mod jump;
 mod movement;
+mod physics;
 mod render;
 mod respawn;
 
+pub use actor_actor_collision::*;
 pub use bounds::*;
-pub use collision::*;
 pub use input::*;
-pub use jump::*;
 pub use movement::*;
+pub use movement::*;
+pub use physics::*;
 pub use render::*;
 pub use respawn::*;

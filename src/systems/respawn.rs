@@ -1,41 +1,23 @@
 use hecs::World;
-use rapier2d::{
-    na::Vector2,
-    prelude::{RigidBodyHandle, RigidBodySet},
-};
 
-use crate::{
-    components::{ActorState, PlayerId},
-    game::PHYSICS_PIXEL_SCALING,
-};
+use crate::components::{ActorState, PhysicsVolume, PhysicsVolumeKind, Position, PositionValue};
 use gamercade_rs::prelude as gc;
 
 /// This system is responsible for respawning players.
 /// Players are ready for respawning when their ActorState is Dead.
-pub fn respawn_system(
-    world: &mut World,
-    rigidbodies: &mut RigidBodySet,
-    screen_width: usize,
-    screen_height: usize,
-) {
+pub fn respawn_system(world: &mut World, screen_width: usize) {
     world
-        .query_mut::<(&RigidBodyHandle, &mut ActorState, &PlayerId)>()
+        .query_mut::<(&mut PhysicsVolume, &mut Position)>()
         .into_iter()
-        .for_each(|(_, (handle, state, player))| {
-            if ActorState::Dead == *state {
-                if let Some(rigidbody) = rigidbodies.get_mut(*handle) {
-                    let x =
-                        gc::random_float_range(0.0, screen_width as f32 / PHYSICS_PIXEL_SCALING);
-                    let y = screen_height as f32 / PHYSICS_PIXEL_SCALING;
-                    let pos = Vector2::new(x, y);
+        .for_each(|(_, (physics, position))| {
+            if let PhysicsVolumeKind::Actor(ActorState::Dead) = physics.kind {
+                let new_x = gc::random_int_range(0, screen_width as i32);
+                let new_y = 0;
 
-                    gc::console_log(&format!("respawning player: {} to {}", player.0, pos));
+                position.x = PositionValue::new(new_x);
+                position.y = PositionValue::new(new_y as i32);
 
-                    rigidbody.set_translation(pos, true);
-                    *state = ActorState::Airborne;
-                } else {
-                    gc::console_log("respawn_system tried to access an invalid RigidBodyHandle")
-                }
+                physics.kind = PhysicsVolumeKind::Actor(ActorState::Airborne);
             };
         });
 }

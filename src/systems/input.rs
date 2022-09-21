@@ -1,7 +1,7 @@
 use hecs::World;
 
 use crate::components::{ButtonState, Controller, PlayerId};
-use gamercade_rs::prelude as gc;
+use gamercade_rs::prelude::{self as gc};
 
 /// This system takes input from the console state and places it into the "Controller"
 /// component to be used throughout the game later
@@ -13,22 +13,12 @@ pub fn input_system(world: &mut World) {
             let player = player.0;
 
             // Handle Up/Down
-            if gc::button_up_held(player) == Some(true) {
-                controller.movement.y = -1.0;
-            } else if gc::button_down_held(player) == Some(true) {
-                controller.movement.y = 1.0;
-            } else {
-                controller.movement.y = 0.0;
-            }
+            controller.movement_y = gc::analog_left_y(player)
+                .map(|val| -val)
+                .unwrap_or_default();
 
             // Handle Left/Right
-            if gc::button_left_held(player) == Some(true) {
-                controller.movement.x = -1.0;
-            } else if gc::button_right_held(player) == Some(true) {
-                controller.movement.x = 1.0;
-            } else {
-                controller.movement.x = 0.0;
-            }
+            controller.movement_x = gc::analog_left_x(player).unwrap_or_default();
 
             //Handle A Button
             if gc::button_a_pressed(player) == Some(true) {
