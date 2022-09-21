@@ -20,7 +20,7 @@ pub struct AnimatedSprite {
     pub flip_x: bool,
     pub flip_y: bool,
 
-    pub current_range: Range<u8>,
+    pub current_anim: AnimState,
     pub frame_count: u8,
 }
 
@@ -38,6 +38,22 @@ impl SpriteKind {
     }
 }
 
-pub const IDLE_RANGE: Range<u8> = 0..14;
-pub const RUN_RANGE: Range<u8> = 15..19;
+#[derive(PartialEq, Eq)]
+pub enum AnimState {
+    Idle,
+    Running,
+}
+
+impl AnimState {
+    pub const IDLE_RANGE: Range<u8> = 0..14;
+    pub const RUN_RANGE: Range<u8> = 15..19;
+
+    pub const fn get_range(&self) -> Range<u8> {
+        match self {
+            AnimState::Idle => Self::IDLE_RANGE,
+            AnimState::Running => Self::RUN_RANGE,
+        }
+    }
+}
+
 pub const TICKS_PER_FRAME: u8 = 6;

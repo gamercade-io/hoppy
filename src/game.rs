@@ -54,7 +54,7 @@ impl crate::Game for MyGame {
                         sprite: 0,
                         flip_x: false,
                         flip_y: false,
-                        current_range: IDLE_RANGE,
+                        current_anim: AnimState::Idle,
                         frame_count: 0,
                     }),
                 });

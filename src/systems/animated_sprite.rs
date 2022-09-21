@@ -9,14 +9,17 @@ pub fn animated_sprite_system(world: &mut World) {
         .for_each(|(_, sprite)| match &mut sprite.kind {
             SpriteKind::Static(_) => (),
             SpriteKind::Animated(animated) => {
+                // Update and tick animations
                 animated.frame_count += 1;
 
                 if animated.frame_count == TICKS_PER_FRAME {
                     animated.sprite += 1;
                     animated.frame_count = 0;
 
-                    if animated.sprite == animated.current_range.end {
-                        animated.sprite = animated.current_range.start;
+                    let range = animated.current_anim.get_range();
+
+                    if animated.sprite == range.end {
+                        animated.sprite = range.start;
                     }
                 }
             }
